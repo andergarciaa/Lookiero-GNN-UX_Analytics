@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tu Perfil - Lookiero</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* Estilos exclusivos para los Tags de Preferencia */
+        .style-tag {
+            border: 1px solid var(--border);
+            background: transparent;
+            color: #666;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+            margin: 0 4px 8px 0;
+            user-select: none;
+        }
+
+        .style-tag:hover {
+            border-color: var(--dark);
+            color: var(--dark);
+        }
+
+        /* Estado seleccionado: Se pone color Coral */
+        .style-tag.active {
+            background-color: var(--coral);
+            border-color: var(--coral);
+            color: white;
+            box-shadow: 0 4px 10px rgba(209, 122, 116, 0.3);
+        }
+
+        .section-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #999;
+            margin-bottom: 1rem;
+            display: block;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-gradient-animate"></div>
+
+    <main class="container min-vh-100 d-flex flex-column justify-content-center align-items-center py-5">
+        
+        <div class="profile-box reveal">
+            <h2 class="playfair text-center mb-1">Tu Espacio</h2>
+            <p class="text-center text-muted Montserrat small mb-4">Personaliza tu experiencia de moda</p>
+
+            <form id="profileForm">
+                <div class="avatar-container">
+                    <div id="imagePreview" class="avatar-preview"></div>
+                    <label for="imageUpload" class="avatar-label"><i class="bi bi-camera-fill"></i></label>
+                    <input type='file' id="imageUpload" hidden accept="image/*" />
+                </div>
+
+                <span class="section-title Montserrat">Datos Personales</span>
+                
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control Montserrat" id="name" placeholder="Nombre">
+                    <label>Nombre completo</label>
+                </div>
+
+                <div class="row g-2 mb-4">
+                    <div class="col-6">
+                        <div class="form-floating">
+                            <input type="date" class="form-control Montserrat" id="date">
+                            <label>Nacimiento</label>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-floating">
+                            <select class="form-select custom-select Montserrat" id="size">
+                                <option value="" selected disabled>Talla</option>
+                                <option value="XS">XS</option>
+                                <option value="S">S</option>
+                                <option value="M">M</option>
+                                <option value="L">L</option>
+                                <option value="XL">XL</option>
+                            </select>
+                            <label>Talla Habitual</label>
+                        </div>
+                    </div>
+                </div>
+
+                <span class="section-title Montserrat mt-4">Tus Preferencias</span>
+                <div class="mb-4 text-center">
+                    <div id="tagsContainer">
+                        <span class="style-tag" onclick="toggleTag(this)">Casual</span>
+                        <span class="style-tag" onclick="toggleTag(this)">Boho Chic</span>
+                        <span class="style-tag" onclick="toggleTag(this)">Minimalist</span>
+                        <span class="style-tag" onclick="toggleTag(this)">Urban</span>
+                        <span class="style-tag" onclick="toggleTag(this)">Vintage</span>
+                        <span class="style-tag" onclick="toggleTag(this)">Office</span>
+                        <span class="style-tag" onclick="toggleTag(this)">Party</span>
+                    </div>
+                </div>
+
+                <button type="button" class="btn-save mt-2" onclick="save()">
+                    Guardar Cambios
+                </button>
+            </form>
+        </div>
+
+        <footer class="mt-5">
+            <a href="/" class="back-home-link Montserrat">← Volver al Inicio</a>
+        </footer>
+    </main>
+
+    <script>
+        const imgInput = document.getElementById('imageUpload');
+        const preview = document.getElementById('imagePreview');
+        const nameInput = document.getElementById('name');
+        const dateInput = document.getElementById('date');
+        const sizeInput = document.getElementById('size');
+
+        // --- CARGAR DATOS GUARDADOS AL INICIAR ---
+        window.onload = () => {
+            // Recuperar nombre
+            const savedName = localStorage.getItem('lookiero_name');
+            if (savedName) nameInput.value = savedName;
+
+            // Recuperar foto (si existe)
+            const savedImg = localStorage.getItem('lookiero_img');
+            if (savedImg) preview.style.backgroundImage = `url(${savedImg})`;
+
+            // Recuperar talla
+            const savedSize = localStorage.getItem('lookiero_size');
+            if (savedSize) sizeInput.value = savedSize;
+        };
+
+        // --- LÓGICA DE FOTO ---
+        imgInput.onchange = () => {
+            const [file] = imgInput.files;
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Mostrar imagen
+                    preview.style.backgroundImage = `url(${e.target.result})`;
+                    // Guardar en localStorage (para que persista)
+                    localStorage.setItem('lookiero_img', e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        // --- LÓGICA DE TAGS ---
+        function toggleTag(element) {
+            element.classList.toggle('active');
+        }
+
+        // --- GUARDAR ---
+        function save() {
+            const btn = document.querySelector('.btn-save');
+            
+            // Validación simple
+            if(!nameInput.value) {
+                alert("Por favor, introduce tu nombre.");
+                return;
+            }
+
+            // Guardar datos en navegador
+            localStorage.setItem('lookiero_name', nameInput.value);
+            localStorage.setItem('lookiero_size', sizeInput.value);
+
+            // Animación de carga
+            btn.disabled = true;
+            const originalText = btn.innerText;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Guardando...';
+
+            setTimeout(() => {
+                btn.innerHTML = '<i class="bi bi-check-lg me-2"></i> ¡Perfil Actualizado!';
+                btn.classList.add('btn-success-custom'); // Usa el verde del CSS global
+                btn.style.backgroundColor = 'var(--teal)'; // Forzamos por si acaso
+                
+                // Redirigir al inicio
+                setTimeout(() => window.location.href = '/', 800);
+            }, 800);
+        }
+    </script>
+</body>
+</html>

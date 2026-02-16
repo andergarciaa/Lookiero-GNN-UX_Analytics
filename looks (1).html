@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lookiero - Explorador de Looks</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;600;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css"> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+</head>
+<body>
+    <div class="bg-gradient-animate"></div>
+
+    <main class="container min-vh-100 d-flex flex-column align-items-center py-5">
+        
+        <div class="alert kafka-alert d-flex align-items-center w-100 reveal" style="max-width: 900px;" role="alert">
+            <div class="d-flex align-items-center">
+                <div class="p-2 bg-warning bg-opacity-10 rounded-circle me-3">
+                    <i class="bi bi-hdd-rack-fill fs-4 text-warning"></i>
+                </div>
+                <div>
+                    <strong class="Montserrat d-block">Estado del Sistema</strong> 
+                    <span class="small text-muted">Asegúrate de que <code style="color:#d63384">docker-compose</code> está funcionando para usar este servicio</span>
+                </div>
+            </div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <header class="text-center mb-5 reveal-delayed">
+            <h3 class="text-uppercase tracking-widest Montserrat mb-3" style="color: var(--coral); letter-spacing: 5px; font-size: 1.2rem;">Fashion Intelligence</h3>
+            <h1 class="display-4 playfair fw-bold">Explorador de Looks</h1>
+        </header>
+
+        <section class="row w-100 justify-content-center text-center mb-5 reveal-delayed" style="max-width: 800px; opacity: 0.9;">
+            <div class="col-3 process-step">
+                <i class="bi bi-hand-index-thumb"></i>
+                <small class="Montserrat text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">1. Elige</small>
+            </div>
+            <div class="col-1 process-arrow">→</div>
+            <div class="col-3 process-step">
+                <i class="bi bi-cpu"></i>
+                <small class="Montserrat text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">2. Procesa</small>
+            </div>
+            <div class="col-1 process-arrow">→</div>
+            <div class="col-3 process-step">
+                <i class="bi bi-magic"></i>
+                <small class="Montserrat text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">3. Descubre</small>
+            </div>
+        </section>
+
+        <section class="selection-card profile-box text-center mb-5 reveal-delayed shadow-lg border-0">
+            <h3 class="playfair mb-4">Prenda Base</h3>
+            <form id="recommendationForm">
+                <div class="mb-4">
+                    <select class="form-select custom-select Montserrat text-center" id="prendaSelector" style="font-size: 1.1rem;">
+                        <option selected disabled value="">Selecciona una prenda...</option>
+                        {% for p in prendas %}
+                            <option value="{{ p.id }}">{{ p.texto }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn-save" id="btnGenerar">
+                    <span class="Montserrat">GENERAR ESTILOS</span>
+                </button>
+            </form>
+        </section>
+
+        <section id="resultsSection" class="w-100 mt-2 reveal-delayed" style="max-width: 1000px; opacity: 0.3; pointer-events: none; transition: all 0.5s;">
+            <div class="text-center mb-5">
+                <span class="badge bg-light text-dark border px-3 py-2 rounded-pill Montserrat text-uppercase" style="letter-spacing: 2px;">Match Perfecto</span>
+                <div id="loadingIndicator" style="display:none;" class="mt-3">
+                    <span class="spinner-grow spinner-grow-sm text-danger" role="status"></span>
+                    <span class="spinner-grow spinner-grow-sm text-danger mx-1" role="status" style="animation-delay: 0.2s"></span>
+                    <span class="spinner-grow spinner-grow-sm text-danger" role="status" style="animation-delay: 0.4s"></span>
+                    <p class="small text-muted mt-2">Consultando lo último en moda...</p>
+                </div>
+            </div>
+            
+            <div class="row g-4 justify-content-center align-items-center">
+                <div class="col-md-3">
+                    <div class="result-card original h-100 border-0 shadow-sm" style="background: #fdfdfd;">
+                        <div class="p-4 h-100 d-flex flex-column justify-content-center text-center">
+                            <span class="small text-uppercase text-muted mb-2 tracking-widest">Tu Selección</span>
+                            <h5 class="playfair fw-bold mb-0" id="orig_name">-</h5>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-1 text-center">
+                    <i class="bi bi-plus-lg text-muted fs-4"></i>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="result-card rec h-100 border-0 shadow-sm position-relative overflow-hidden">
+                        <div class="position-absolute top-0 start-0 w-100 h-100 bg-white" style="opacity: 0.5; z-index:0;"></div>
+                        <div class="p-4 h-100 d-flex flex-column justify-content-center text-center position-relative" style="z-index:1;">
+                            <span class="small text-uppercase mb-2 tracking-widest" style="color: var(--coral);">Combina con</span>
+                            <h5 class="playfair fw-bold" id="rec1_name">...</h5>
+                            <small class="text-muted fst-italic" id="rec1_color">-</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-1 text-center">
+                    <i class="bi bi-plus-lg text-muted fs-4"></i>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="result-card rec h-100 border-0 shadow-sm position-relative overflow-hidden">
+                        <div class="p-4 h-100 d-flex flex-column justify-content-center text-center">
+                            <span class="small text-uppercase mb-2 tracking-widest" style="color: var(--coral);">Y añade</span>
+                            <h5 class="playfair fw-bold" id="rec2_name">...</h5>
+                            <small class="text-muted fst-italic" id="rec2_color">-</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-flex flex-column align-items-center gap-4 mt-5 pb-5">
+                <div class="d-flex gap-3 align-items-center">
+                    <button class="btn btn-cta-fav Montserrat">
+                        <i class="bi bi-heart me-2"></i> Guardar
+                    </button>
+                    
+                    <button class="btn btn-cta-buy Montserrat">
+                        Comprar Look <i class="bi bi-bag-check-fill ms-2"></i>
+                    </button>
+                </div>
+
+                <button id="btnTryNext" class="btn-pill-next Montserrat" style="display: none;">
+                    <i class="bi bi-arrow-repeat"></i> 
+                    <span>No me convence, muéstrame otra opción</span>
+                </button>
+                
+                <small id="counterLabel" class="text-muted" style="font-size: 0.7rem; opacity:0; transition: opacity 0.3s;"></small>
+            </div>
+
+        </section>
+
+        <footer class="mt-auto py-4 opacity-75">
+            <a href="/" class="back-home-link Montserrat small">← Volver al Inicio</a>
+        </footer>
+    </main>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const socket = io();
+        const form = document.getElementById('recommendationForm');
+        const resultsSection = document.getElementById('resultsSection');
+        const loader = document.getElementById('loadingIndicator');
+        const btnNext = document.getElementById('btnTryNext');
+        const counterLabel = document.getElementById('counterLabel');
+
+        let currentRecommendations = [];
+        let currentIndex = 0;
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const selector = document.getElementById('prendaSelector');
+            const idPrenda = selector.value;
+            const textoPrenda = selector.options[selector.selectedIndex].text;
+
+            if (!idPrenda) { alert("selecciona una prenda primero."); return; }
+
+            document.getElementById('orig_name').innerText = textoPrenda.split('(')[0]; 
+            loader.style.display = 'block';
+            resultsSection.style.opacity = '0.5';
+            btnNext.style.display = 'none'; 
+            counterLabel.style.opacity = '0';
+
+            socket.emit('activar_kafka', { id: idPrenda });
+        });
+
+        socket.on('resultado_server', function(msg) {
+            loader.style.display = 'none';
+
+            if (msg.success && msg.data.length > 0) {
+                currentRecommendations = msg.data;
+                currentIndex = 0; 
+
+                updateUI(currentRecommendations[0]);
+                
+                resultsSection.style.opacity = '1';
+                resultsSection.style.pointerEvents = 'auto';
+
+                if (currentRecommendations.length > 1) {
+                    btnNext.style.display = 'inline-flex';
+                    updateCounter();
+                }
+
+                // Scroll suave hacia los resultados
+                resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            } else {
+                alert("No encontramos combinaciones perfectas para esta prenda. ¡Prueba con otra!");
+                resultsSection.style.opacity = '0.3';
+            }
+        });
+
+        btnNext.addEventListener('click', function() {
+            currentIndex = (currentIndex + 1) % currentRecommendations.length;
+            
+            // Animación simple de desvanecimiento
+            const cards = document.querySelectorAll('.result-card.rec');
+            cards.forEach(c => c.style.opacity = '0');
+            
+            setTimeout(() => {
+                updateUI(currentRecommendations[currentIndex]);
+                updateCounter();
+                cards.forEach(c => c.style.opacity = '1');
+            }, 300);
+        });
+
+        function updateUI(itemData) {
+            document.getElementById('rec1_name').innerText = itemData.items[0].nombre;
+            document.getElementById('rec1_color').innerText = itemData.items[0].color;
+            document.getElementById('rec2_name').innerText = itemData.items[1].nombre;
+            document.getElementById('rec2_color').innerText = itemData.items[1].color;
+        }
+
+        function updateCounter() {
+            counterLabel.innerText = `Opción ${currentIndex + 1} de ${currentRecommendations.length} disponibles`;
+            counterLabel.style.opacity = '1';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,399 @@
+/* =========================================
+   1. VARIABLES Y CONFIGURACIÓN GLOBAL
+   ========================================= */
+:root {
+    --coral: #D17A74;
+    --teal: #4FB097;
+    --cream: #FDFBF9;
+    --dark: #1A1A1A;
+    --white: #ffffff;
+    --gray-muted: #6c757d;
+    --border: #EEEEEE;
+}
+
+body {
+    background-color: var(--cream);
+    font-family: 'Montserrat', sans-serif;
+    color: var(--dark);
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+}
+
+/* Tipografías Globales */
+.playfair { font-family: 'Playfair Display', serif; }
+.Montserrat { font-family: 'Montserrat', sans-serif; }
+
+a { text-decoration: none; color: inherit; }
+
+/* =========================================
+   2. FONDO ANIMADO
+   ========================================= */
+.bg-gradient-animate {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 10% 20%, rgba(209, 122, 116, 0.05) 0%, rgba(79, 176, 151, 0.05) 90%);
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* =========================================
+   3. ANIMACIONES DE ENTRADA
+   ========================================= */
+.reveal {
+    animation: fadeInUp 1.2s ease forwards;
+}
+
+.reveal-delayed {
+    opacity: 0;
+    animation: fadeInUp 1.2s ease 0.4s forwards;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================================
+   4. BOTONES Y FORMULARIOS GENERALES
+   ========================================= */
+.btn-save {
+    background: var(--dark);
+    color: #fff;
+    border: none;
+    width: 100%;
+    padding: 1.1rem;
+    border-radius: 15px;
+    font-weight: 600;
+    transition: all 0.4s ease;
+    cursor: pointer;
+}
+
+.btn-save:hover {
+    background: var(--coral);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(209, 122, 116, 0.2);
+}
+
+.btn-success-custom {
+    background: var(--teal) !important;
+}
+
+/* Inputs estilo "material" sin bordes laterales */
+.form-control { 
+    border: none;
+    border-bottom: 1.5px solid var(--border);
+    border-radius: 0; 
+    padding-left: 0;
+    background: transparent !important;
+}
+
+.form-control:focus {
+    box-shadow: none;
+    border-color: var(--coral);
+}
+
+.form-select.custom-select {
+    border-radius: 15px;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    background-color: var(--white);
+}
+
+/* =========================================
+   5. PÁGINA INICIO (Tarjetas de Navegación)
+   ========================================= */
+.nav-card {
+    display: block;
+    position: relative;
+    height: 350px;
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.card-img {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.8s ease;
+}
+
+.card-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 2rem;
+    color: white;
+    transition: background 0.4s ease;
+}
+
+.card-overlay h3 { margin-bottom: 0.2rem; font-size: 1.8rem; }
+.card-overlay span { 
+    font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; 
+    opacity: 0.8; transform: translateY(10px); transition: all 0.4s ease;
+}
+
+.nav-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(209, 122, 116, 0.2); }
+.nav-card:hover .card-img { transform: scale(1.1); }
+.nav-card:hover .card-overlay { background: linear-gradient(to top, var(--coral) 0%, transparent 100%); }
+.nav-card:hover .card-overlay span { transform: translateY(0); opacity: 1; }
+
+/* =========================================
+   6. PÁGINA LOOKS (Resultados)
+   ========================================= */
+.result-card {
+    background: var(--white);
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.02);
+    height: 100%;
+}
+
+.result-card:hover { transform: translateY(-5px); }
+.result-card.original { border-left: 4px solid var(--dark); }
+.result-card.rec { border-left: 4px solid var(--coral); }
+
+/* =========================================
+   7. PÁGINA PERFIL (Avatar y Caja)
+   ========================================= */
+.profile-box {
+    background: #fff;
+    padding: 3rem 2.5rem;
+    border-radius: 40px;
+    width: 100%;
+    max-width: 450px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.03);
+    margin: auto;
+}
+
+.avatar-container {
+    position: relative;
+    width: 140px;
+    margin: 0 auto 2.5rem;
+}
+
+.avatar-preview { 
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    border: 4px solid #fff;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    background: url('https://via.placeholder.com/150/FDFBF9/D17A74?text=Foto') center/cover;
+}
+
+.avatar-label {
+    position: absolute; bottom: 5px; right: 5px;
+    width: 35px; height: 35px;
+    background: var(--coral); color: #fff;
+    border-radius: 50%; cursor: pointer;
+    display: grid; place-items: center;
+    box-shadow: 0 4px 10px rgba(209,122,116,0.3);
+    transition: transform 0.2s;
+}
+.avatar-label:hover { transform: scale(1.1); }
+
+/* =========================================
+   8. PÁGINA ANÁLISIS (Dashboard)
+   ========================================= */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    gap: 2rem;
+    width: 100%;
+    margin-bottom: 3rem;
+}
+
+.chart-card {
+    background: var(--white);
+    padding: 1.8rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid rgba(0,0,0,0.02);
+}
+
+.chart-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(209, 122, 116, 0.15);
+    border-color: var(--coral);
+    z-index: 10;
+}
+
+.chart-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
+    color: var(--dark);
+    border-left: 4px solid var(--coral);
+    padding-left: 15px;
+}
+
+/* D3.js Estilos */
+.tooltip {
+    position: absolute;
+    background: var(--dark);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    pointer-events: none;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    z-index: 100;
+}
+
+rect, path.slice {
+    transition: all 0.3s ease;
+    transform-box: fill-box;
+    transform-origin: center;
+    cursor: pointer;
+}
+
+rect:hover, path.slice:hover {
+    transform: scale(1.05);
+    filter: brightness(0.9);
+}
+
+.faded { opacity: 0.3 !important; }
+
+/* =========================================
+   9. FOOTER Y UTILIDADES
+   ========================================= */
+footer {
+    margin-top: auto;
+    width: 100%;
+    text-align: center;
+    padding: 2rem 0;
+}
+
+.back-home-link {
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    opacity: 0.7;
+    transition: all 0.3s;
+}
+.back-home-link:hover { color: var(--coral); opacity: 1; transform: translateX(-5px); display:inline-block;}
+
+/* =========================================
+   10. ESTILOS ESPECÍFICOS DE LOOKS (PREMIUM)
+   ========================================= */
+
+/* Alerta de Kafka */
+.kafka-alert {
+    background-color: #fffbf0;
+    border-left: 5px solid #ffc107;
+    color: #856404;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.03);
+    border: 1px solid rgba(0,0,0,0.02);
+}
+
+/* Pasos del proceso */
+.process-step i { font-size: 2rem; color: var(--teal); margin-bottom: 10px; display: block; transition: transform 0.3s; }
+.process-step:hover i { transform: scale(1.2); color: var(--coral); }
+.process-arrow { font-size: 1.5rem; color: #e0e0e0; margin-top: 1rem; }
+
+/* --- BOTONES PREMIUM --- */
+
+/* 1. Botón COMPRAR */
+.btn-cta-buy {
+    background: linear-gradient(135deg, var(--coral) 0%, #c4645e 100%);
+    color: white;
+    border: none;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 12px 30px;
+    border-radius: 50px;
+    box-shadow: 0 10px 25px rgba(209, 122, 116, 0.4); 
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn-cta-buy::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: 0.6s;
+    z-index: -1;
+}
+
+.btn-cta-buy:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(209, 122, 116, 0.6);
+    color: white;
+}
+
+.btn-cta-buy:hover::before {
+    left: 100%; 
+}
+
+/* 2. Botón FAVORITO */
+.btn-cta-fav {
+    background: transparent;
+    color: var(--dark);
+    border: 2px solid var(--dark);
+    font-weight: 600;
+    padding: 10px 25px;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+}
+
+.btn-cta-fav:hover {
+    background: var(--dark);
+    color: white;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    transform: translateY(-2px);
+}
+
+/* 3. Botón "PROBAR OTRA" */
+.btn-pill-next {
+    background-color: white;
+    color: #999;
+    border: 1px solid #eee;
+    border-radius: 30px;
+    padding: 8px 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    transition: all 0.3s ease;
+    margin-top: 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-pill-next:hover {
+    background-color: white;
+    color: var(--coral);
+    border-color: var(--coral);
+    box-shadow: 0 8px 20px rgba(209, 122, 116, 0.15);
+    transform: translateY(-2px);
+    cursor: pointer;
+}
+
+.btn-pill-next i { transition: transform 0.5s ease; }
+.btn-pill-next:hover i { transform: rotate(180deg); }
